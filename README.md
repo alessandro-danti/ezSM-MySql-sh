@@ -1,3 +1,9 @@
+This is a fork of https://github.com/shevabam/ezservermonitor-sh, intended to add functionalities to save the script
+data to a MySql database.
+The core functionality stays the same as the original script, which will be kept up to date as the original author commits new releases.
+
+---
+
 [eZ Server Monitor](http://www.ezservermonitor.com) (eSM) is a script for monitoring Linux servers. It is available in [Bash](http://www.ezservermonitor.com/esm-sh/features) version and [Web](http://www.ezservermonitor.com/esm-web/features) application.
 
 # eZ Server Monitor `sh
