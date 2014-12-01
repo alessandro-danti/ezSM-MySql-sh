@@ -2,6 +2,10 @@ This is a fork of https://github.com/shevabam/ezservermonitor-sh, intended to ad
 data to a MySql database.
 The core functionality stays the same as the original script, which will be kept up to date as the original author commits new releases.
 
+Changelog 1.12.2014
+ - Created branch "development" where not production ready code can be found - USE AT YOUR OWN RISK.
+   If you want to be sure that I have tested stuff throughly, please stick to the "master" branch.
+
 Changelog 25.11.2014
  - First version of the Database Schema uploaded in draw.io XML format
 
