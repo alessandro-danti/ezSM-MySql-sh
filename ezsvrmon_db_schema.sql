@@ -100,7 +100,7 @@ DROP TABLE IF EXISTS `NetworkInterfaces`;
 CREATE TABLE `NetworkInterfaces` (
   `System_SystemID` int(11) NOT NULL,
   `InterfaceName` varchar(10) DEFAULT NULL,
-  `InterfaceIP` int(11) DEFAULT NULL,
+  `InterfaceIP` int(11) unsigned DEFAULT NULL,
   `Timestamp` datetime DEFAULT NULL,
   `InterfaceID` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`InterfaceID`),
