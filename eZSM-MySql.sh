@@ -97,90 +97,76 @@ IFS=$OFS
 myTimestamp=$(date +%s)
 
 # Table System
-echo $myHostname
-echo $myOS
-echo $myKernel
-echo $myUptime
-echo $myLastBoot
-echo $myCurrentUser
-echo $myDatetime
-
 mySystemInsert="INSERT INTO System VALUES ('', '$myHostname', '$myOS', '$myKernel', '$myUptime', '$myLastBoot', '$myCurrentUser', FROM_UNIXTIME('$myTimestamp'));"
 
-echo "$mySystemInsert"
+# echo "$mySystemInsert"
 
 # Table LoadAverage
-echo $myLoadOne
-echo $myLoadFive
-echo $myLoadFifteen
-echo $myProcesses
-
 myLoadAvgInsert="INSERT INTO LoadAverage VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), '$myLoadOne', '$myLoadFive', '$myLoadFifteen', '$myProcesses', FROM_UNIXTIME('$myTimestamp'));"
 
-echo "$myLoadAvgInsert"
+# echo "$myLoadAvgInsert"
 
 # Table CPU
-echo $myCPUModel
-echo $myCPUFrequency
-echo $myCPUCache
-echo $myCPUBogomips
-
 myCPUInsert="INSERT INTO CPU VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), '$myCPUModel', '$myCPUFrequency', '$myCPUCache', '$myCPUBogomips', FROM_UNIXTIME('$myTimestamp'));"
 
-echo "$myCPUInsert"
+# echo "$myCPUInsert"
 
 # Table RAM
-echo $myRAMTotal
-echo $myRAMFree
-
 myRAMInsert="INSERT INTO RAM VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), '$myRAMTotal', '$myRAMFree', FROM_UNIXTIME('$myTimestamp'));"
 
-echo "$myRAMInsert"
+# echo "$myRAMInsert"
 
 # Table NetworkInterfaces
 for i in "${!myLANInterfaces[@]}"
 do
-	echo $i
-	echo ${myLANInterfaces[$i]}
-	myNetworkInsert="INSERT INTO NetworkInterfaces VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), '$i', '${myLANInterfaces[$i]}', FROM_UNIXTIME('$myTimestamp'), '');"
-	echo "$myNetworkInsert"
+	myNetworkInsert="$myNetworkInsert\nINSERT INTO NetworkInterfaces VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), '$i', '${myLANInterfaces[$i]}', FROM_UNIXTIME('$myTimestamp'), '');"
+	# echo "$myNetworkInsert"
 done
 
-echo $myIPWAN
-
-myIPWANInsert="INSERT INTO NetworkInterfaces VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), 'WAN', '$myIPWAN', '$myTimeStamp')"
+myIPWANInsert="INSERT INTO NetworkInterfaces VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), 'WAN', '$myIPWAN', FROM_UNIXTIME('$myTimestamp'), '');"
+# echo $myIPWANInsert
 
 # Table Ping
 for e in "${!myPingHosts[@]}"
 do
-	echo $e
-	echo ${myPingHosts[$e]}
-	myPingInsert="INSERT INTO Ping VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), '$e', '${myPingHosts[$e]}', FROM_UNIXTIME('$myTimestamp'), '');"
-        echo "$myPingInsert"
+	myPingInsert="$myPingInsert\nINSERT INTO Ping VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), '$e', '${myPingHosts[$e]}', FROM_UNIXTIME('$myTimestamp'), '');"
+        # echo "$myPingInsert"
 done
 
 # Table Diskspace
 for o in "${!myDiskDevices[@]}"
 do
-	echo $o
-	echo ${myDiskDevices[$o]}
-	myDiskInsert="INSERT INTO Diskspace VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), '$o', '${myDiskDevices[$o]}', FROM_UNIXTIME('$myTimestamp'), '');"
-	echo "$myDiskInsert"
+	myDiskInsert="$myDiskInsert\nINSERT INTO Diskspace VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), '$o', '${myDiskDevices[$o]}', FROM_UNIXTIME('$myTimestamp'), '');"
+	# echo "$myDiskInsert"
 done
 
 # Table Services
 for u in "${!myServices[@]}"
 do
-	echo $u
-	echo ${myServices[$u]}
 	if [[ ${myServices[$u]} == "OFFLINE" ]]
 	then
 		myServiceStatus=0
 	else
 		myServiceStatus=1
 	fi
-	myServicesInsert="INSERT INTO Services VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), '$(echo $u|awk -F"(" '{ print $1}'| sed 's/^[ \t]*//;s/[ \t]*$//')', '$myHostname', '$(echo $u|awk -F"(" '{ print $2 }'|tr -d "()")', '$myServiceStatus', FROM_UNIXTIME('$myTimestamp'), '');"
-	echo "$myServicesInsert"
+	myServicesInsert="$myServicesInsert\nINSERT INTO Services VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), '$(echo $u|awk -F"(" '{ print $1}'| sed 's/^[ \t]*//;s/[ \t]*$//')', '$myHostname', '$(echo $u|awk -F"(" '{ print $2 }'|tr -d "()")', '$myServiceStatus', FROM_UNIXTIME('$myTimestamp'), '');"
+	# echo "$myServicesInsert"
 done
+
+/usr/bin/mysql -u ezsmdb -pWelcome123 -D ezSvrMon -t<<EOF
+$(echo $mySystemInsert)
+$(echo $myLoadAvgInsert)
+$(echo $myCPUInsert)
+$(echo $myRAMInsert)
+$(echo -e $myNetworkInsert)
+$(echo $myIPWANInsert)
+$(echo -e $myPingInsert)
+$(echo -e $myDiskInsert)
+$(echo -e $myServicesInsert)
+EOF
+
+	
+
+
 
 rm $myOutput
