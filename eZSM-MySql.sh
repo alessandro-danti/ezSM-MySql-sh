@@ -11,6 +11,14 @@ myDbUser="ezsmdb"
 myDbPass="Welcome123"
 myDbHost="localhost"
 
+# IP to integer conversion function 
+ip2dec () {
+    local a b c d ip=$@
+    IFS=. read -r a b c d <<< "$ip"
+    printf '%d\n' "$((a * 256 ** 3 + b * 256 ** 2 + c * 256 + d))"
+}
+
+# Enable to avoid printing any error to STDOUT - for DEBUG
 exec 2> /dev/null
 
 myOutput=$(mktemp)
@@ -75,12 +83,12 @@ do
 		;;
 		*"IP LAN"*)
 			declare -A myLANInterfaces
-			myInterface=$(echo $myLine|awk -F" " '{ print $3 }')
-			myIPAddress=$(echo $myLine|awk -F"\t" '{ print $2 }')
+			myInterface=$(echo $myLine|awk -F" " '{ print $3 }'|sed -e 's/^[ \t]*//')
+			myIPAddress=$(echo $myLine|awk -F"\t" '{ print $2 }'|sed -e 's/^[ \t]*//')
 			myLANInterfaces[$myInterface]=$myIPAddress
 			;;	
 		*"IP WAN"*)
-			myIPWAN=$(echo $myLine|awk -F"\t" '{ print $2 }')
+			myIPWAN=$(echo $myLine|awk -F"\t" '{ print $2 }'|sed -e 's/^[ \t]*//')
 			;;
 		*"ms"*)
 			declare -A myPingHosts
@@ -127,11 +135,14 @@ myRAMInsert="INSERT INTO RAM VALUES ((SELECT SystemID FROM System WHERE LastChan
 # Table NetworkInterfaces
 for i in "${!myLANInterfaces[@]}"
 do
-	myNetworkInsert="$myNetworkInsert\nINSERT INTO NetworkInterfaces VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), '$i', '${myLANInterfaces[$i]}', FROM_UNIXTIME('$myTimestamp'), '');"
-	# echo "$myNetworkInsert"
+	myConvertedLANIP=$(ip2dec "${myLANInterfaces[$i]}")
+	myNetworkInsert="$myNetworkInsert\nINSERT INTO NetworkInterfaces VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), '$i', '$myConvertedLANIP', FROM_UNIXTIME('$myTimestamp'), '');"
+	# echo -e "$i -- $myNetworkInsert"
 done
 
-myIPWANInsert="INSERT INTO NetworkInterfaces VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), 'WAN', '$myIPWAN', FROM_UNIXTIME('$myTimestamp'), '');"
+myConvertedWANIP=$(ip2dec "$myIPWAN")
+
+myIPWANInsert="INSERT INTO NetworkInterfaces VALUES ((SELECT SystemID FROM System WHERE LastChanged = FROM_UNIXTIME($myTimestamp) AND Hostname = '$myHostname'), 'WAN', '$myConvertedWANIP', FROM_UNIXTIME('$myTimestamp'), '');"
 # echo $myIPWANInsert
 
 # Table Ping
@@ -172,9 +183,5 @@ $(echo -e $myPingInsert)
 $(echo -e $myDiskInsert)
 $(echo -e $myServicesInsert)
 EOF
-
-	
-
-
 
 rm $myOutput
