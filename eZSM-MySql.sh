@@ -3,6 +3,14 @@
 # eZSM-MySql.sh
 #
 # Wrapper script to store the data from eZServerMonitor.sh
+
+# Database settings
+
+myDbName="ezSvrMon"
+myDbUser="ezsmdb"
+myDbPass="Welcome123"
+myDbHost="localhost"
+
 exec 2> /dev/null
 
 myOutput=$(mktemp)
@@ -153,7 +161,7 @@ do
 	# echo "$myServicesInsert"
 done
 
-/usr/bin/mysql -u ezsmdb -pWelcome123 -D ezSvrMon -t<<EOF
+/usr/bin/mysql -u $myDbUser -p$myDbPass -D $myDbName -t<<EOF
 $(echo $mySystemInsert)
 $(echo $myLoadAvgInsert)
 $(echo $myCPUInsert)
