@@ -2,6 +2,10 @@ This is a fork of https://github.com/shevabam/ezservermonitor-sh, intended to ad
 data to a MySql database.
 The core functionality stays the same as the original script, which will be kept up to date as the original author commits new releases.
 
+Changelog 15.12.2014
+ - The wrapper script has been tested and it is correcly executing the SQL Insert statements in the database,
+   thanks to a heredoc section
+
 Changelog 13.12.2014
  - Updated database schema after some testing, some foreign keys were not properly configured.
  - Initial script testing
