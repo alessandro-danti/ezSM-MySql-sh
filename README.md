@@ -5,7 +5,7 @@ The core functionality stays the same as the original script, which will be kept
 Changelog 15.12.2014
  - The wrapper script has been tested and it is correcly executing the SQL Insert statements in the database,
    thanks to a heredoc section
- - Updated field InterfaceIP of table NetworkInterfaces to INT unsigned, as per http://dev.mysql.com/doc/refman/5.0/en/miscellaneous-functions.html#function_inet-aton
+ - Updated field InterfaceIP of table NetworkInterfaces to INT unsigned, as per http://dev.mysql.com/doc/refman/5.0/en/miscellaneous-functions.html#function_inet-aton note
 
 Changelog 13.12.2014
  - Updated database schema after some testing, some foreign keys were not properly configured.
