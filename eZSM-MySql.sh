@@ -23,6 +23,12 @@ exec 2> /dev/null
 
 myOutput=$(mktemp)
 
+if [ -z "$1" ]
+then
+	echo "You have to choose which checks you want to run! Exiting..."
+	exit 1
+fi 
+
 $(dirname $0)/eZServerMonitor.sh $1|sed 's/\x1b\[[0-9;]*m//g' > $myOutput
 
 OFS=$IFS
