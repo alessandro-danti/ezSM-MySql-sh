@@ -2,6 +2,12 @@ This is a fork of https://github.com/shevabam/ezservermonitor-sh, intended to ad
 data to a MySql database.
 The core functionality stays the same as the original script, which will be kept up to date as the original author commits new releases.
 
+Changelog 29.4.2015
+ - Back to work after some months of hiatus!
+ - Added check in wrapper script to see if the optional argument is passed or not. In case it is not, the script exits with an error message and status 1.
+ - Added service script "CLEAN_DB.sh" to clean the database entirely. A variable has to be set with a specific value (DEV) as a failsafe check, 
+   as the script wipes the database completely
+
 Changelog 15.12.2014
  - The wrapper script has been tested and it is correcly executing the SQL Insert statements in the database,
    thanks to a heredoc section
